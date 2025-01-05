@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Existing head content -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEET Prep Quiz</title>
@@ -30,6 +31,40 @@
                 </div>
             </div>
         </header>
+
+        <!-- Overall Score Section -->
+        <section class="score-section card">
+            <h2>Overall Performance</h2>
+            <div class="score-details">
+                <div class="score-item">
+                    <h3>Total Score:</h3>
+                    <p id="overallScore">0</p>
+                </div>
+                <div class="score-item">
+                    <h3>Total Quizzes:</h3>
+                    <p id="totalQuizzes">0</p>
+                </div>
+                <div class="score-item">
+                    <h3>Accuracy:</h3>
+                    <p id="overallAccuracy">0%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Daily Score Section -->
+        <section class="daily-score-section card" id="dailyScoreSection" style="display:none;">
+            <h2>Today's Quiz Performance</h2>
+            <div class="score-details">
+                <div class="score-item">
+                    <h3>Today's Score:</h3>
+                    <p id="dailyScore">0</p>
+                </div>
+                <div class="score-item">
+                    <h3>Accuracy:</h3>
+                    <p id="dailyAccuracy">0%</p>
+                </div>
+            </div>
+        </section>
 
         <!-- Quiz Selection Dropdown -->
         <section class="quiz-selection card">

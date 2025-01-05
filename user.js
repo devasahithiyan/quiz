@@ -49,6 +49,15 @@ const closeLeaderboardBtn = document.getElementById('closeLeaderboard');
 
 const resetQuizzesBtn = document.getElementById('resetQuizzes');
 
+// New DOM Elements for Overall and Daily Scores
+const overallScoreElement = document.getElementById('overallScore');
+const totalQuizzesElement = document.getElementById('totalQuizzes');
+const overallAccuracyElement = document.getElementById('overallAccuracy');
+
+const dailyScoreSection = document.getElementById('dailyScoreSection');
+const dailyScoreElement = document.getElementById('dailyScore');
+const dailyAccuracyElement = document.getElementById('dailyAccuracy');
+
 // Theme Elements
 const themeSwitch = document.getElementById('themeSwitch');
 
@@ -77,6 +86,7 @@ themeSwitch.addEventListener('change', () => {
 document.addEventListener('DOMContentLoaded', async () => {
     await populateQuizDropdown();
     populateCompletedQuizzes();
+    calculateAndDisplayScores();
 });
 
 // Function to populate quiz dropdown with dates
@@ -136,6 +146,17 @@ function displayCompletedQuiz(quizId) {
     } else {
         completedPromoCodeDiv.style.display = 'none';
     }
+
+    // Display daily score if the completed quiz is from today
+    const quizDate = completedQuizzes[quizId].date;
+    const today = new Date().toISOString().split('T')[0];
+    if (quizDate === today) {
+        dailyScoreElement.innerText = score;
+        dailyAccuracyElement.innerText = `${getAccuracyPercentage(quizId)}%`;
+        dailyScoreSection.style.display = 'block';
+    } else {
+        dailyScoreSection.style.display = 'none';
+    }
 }
 
 // Function to display quiz questions
@@ -152,6 +173,7 @@ async function displayQuiz(quizId) {
         quizDateDisplay.innerText = quizData.date;
         quizSection.style.display = 'block';
         completedSection.style.display = 'none';
+        dailyScoreSection.style.display = 'none';
 
         questionContainer.innerHTML = ''; // Clear previous questions
 
@@ -180,6 +202,7 @@ async function displayQuiz(quizId) {
         // Attach quiz data to a global variable for submission
         window.currentQuizData = {
             id: quizDoc.id,
+            date: quizDoc.data().date,
             ...quizData
         };
 
@@ -203,6 +226,7 @@ function submitQuiz() {
     }
 
     const quizId = window.currentQuizData.id;
+    const quizDate = window.currentQuizData.date;
     const totalQuestions = window.currentQuizData.questions.length;
     let score = 0;
     let userAnswers = [];
@@ -224,16 +248,95 @@ function submitQuiz() {
 
     const percentage = ((score / totalQuestions) * 100).toFixed(2);
 
-    // Store the quiz completion in localStorage with detailed answers
+    // Store the quiz completion in localStorage with detailed answers and date
     const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes')) || {};
     completedQuizzes[quizId] = { 
         score: Number(percentage),
-        userAnswers: userAnswers
+        userAnswers: userAnswers,
+        date: quizDate // Store the date of the quiz
     };
     localStorage.setItem('completedQuizzes', JSON.stringify(completedQuizzes));
 
+    // Update Overall Scores
+    calculateAndDisplayScores();
+
     // Display results
     displayResults(percentage, userAnswers);
+}
+
+// Function to calculate and display Overall and Daily Scores
+function calculateAndDisplayScores() {
+    const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes')) || {};
+    const quizIds = Object.keys(completedQuizzes);
+    const totalQuizzes = quizIds.length;
+
+    if (totalQuizzes === 0) {
+        overallScoreElement.innerText = '0';
+        totalQuizzesElement.innerText = '0';
+        overallAccuracyElement.innerText = '0%';
+        dailyScoreSection.style.display = 'none';
+        return;
+    }
+
+    let cumulativeScore = 0;
+    let totalQuestionsAttempted = 0;
+    let totalCorrectAnswers = 0;
+
+    // Get today's date
+    const today = new Date().toISOString().split('T')[0];
+    let todayQuizId = null;
+
+    quizIds.forEach((quizId) => {
+        const quiz = completedQuizzes[quizId];
+        cumulativeScore += quiz.score;
+        const numQuestions = quiz.userAnswers.length;
+        totalQuestionsAttempted += numQuestions;
+        quiz.userAnswers.forEach(answer => {
+            if (answer.selectedOption === answer.correctOption) {
+                totalCorrectAnswers += 1;
+            }
+        });
+
+        // Check if the quiz was taken today
+        if (quiz.date === today) {
+            todayQuizId = quizId;
+        }
+    });
+
+    const averageScore = (cumulativeScore / totalQuizzes).toFixed(2);
+    const overallAccuracy = ((totalCorrectAnswers / totalQuestionsAttempted) * 100).toFixed(2);
+
+    overallScoreElement.innerText = averageScore;
+    totalQuizzesElement.innerText = totalQuizzes;
+    overallAccuracyElement.innerText = `${overallAccuracy}%`;
+
+    // If there's a quiz taken today, display daily score and accuracy
+    if (todayQuizId) {
+        const todayQuiz = completedQuizzes[todayQuizId];
+        dailyScoreElement.innerText = todayQuiz.score;
+        const dailyAccuracy = getAccuracyPercentage(todayQuizId);
+        dailyAccuracyElement.innerText = `${dailyAccuracy}%`;
+        dailyScoreSection.style.display = 'block';
+    } else {
+        dailyScoreSection.style.display = 'none';
+    }
+}
+
+// Helper function to calculate accuracy percentage for a specific quiz
+function getAccuracyPercentage(quizId) {
+    const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes')) || {};
+    if (!completedQuizzes.hasOwnProperty(quizId)) return 0;
+
+    const quiz = completedQuizzes[quizId];
+    const totalQuestions = quiz.userAnswers.length;
+    let correctAnswers = 0;
+    quiz.userAnswers.forEach(answer => {
+        if (answer.selectedOption === answer.correctOption) {
+            correctAnswers += 1;
+        }
+    });
+    const accuracy = ((correctAnswers / totalQuestions) * 100).toFixed(2);
+    return accuracy;
 }
 
 // Function to display quiz results
@@ -370,7 +473,7 @@ function displayLeaderboard() {
     const leaderboardData = [];
 
     for (let quizId in completedQuizzes) {
-        const quizDate = getQuizDateById(quizId);
+        const quizDate = completedQuizzes[quizId].date;
         const score = completedQuizzes[quizId].score;
         leaderboardData.push({ quizDate, score });
     }
@@ -392,21 +495,6 @@ function displayLeaderboard() {
 
     // Display leaderboard section
     leaderboardSection.style.display = 'block';
-}
-
-// Helper function to get quiz date by ID
-async function getQuizDateById(quizId) {
-    try {
-        const quizDoc = await getDoc(doc(db, "quizzes", quizId));
-        if (quizDoc.exists()) {
-            return quizDoc.data().date;
-        } else {
-            return 'Unknown Date';
-        }
-    } catch (error) {
-        console.error("Error fetching quiz date: ", error);
-        return 'Error';
-    }
 }
 
 // Event listener for resetting all quiz attempts
