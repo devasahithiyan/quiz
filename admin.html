@@ -1,0 +1,66 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - NEET Prep Quiz</title>
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Admin Panel</h1>
+
+        <!-- Navigation to User Page -->
+        <div class="admin-toggle">
+            <a href="index.html" class="btn">Go to Quiz</a>
+        </div>
+
+        <!-- Admin Section -->
+        <div class="admin-section active" id="adminSection">
+            <h2>Add New Quiz</h2>
+            <form id="adminForm" class="admin-form">
+                <label for="quizDate">Quiz Date:</label>
+                <input type="date" id="quizDate" required>
+
+                <div id="questionsContainer">
+                    <!-- Dynamic Question Groups Will Appear Here -->
+                </div>
+
+                <button type="button" class="btn add-question-btn" id="addQuestion">Add Question</button>
+                <button type="submit" class="btn">Add Quiz</button>
+            </form>
+
+            <!-- Bulk Upload Section -->
+            <div class="bulk-upload-section">
+                <h2>Bulk Upload Quizzes</h2>
+                <textarea id="bulkUploadTextarea" rows="10" placeholder="Paste your quizzes in JSON format here..."></textarea>
+                <button type="button" class="btn" id="bulkUploadBtn">Upload Quizzes</button>
+                <div id="bulkUploadFeedback" class="feedback"></div>
+            </div>
+
+            <!-- Quiz List Section -->
+            <div class="quiz-list">
+                <h2>Existing Quizzes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Quiz Date</th>
+                            <th>Number of Questions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quizListBody">
+                        <!-- Existing quizzes will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>

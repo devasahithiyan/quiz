@@ -1,0 +1,110 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEET Prep Quiz</title>
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for statistics visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1>NEET Prep Quiz</h1>
+            <div class="header-actions">
+                <!-- Theme Toggle -->
+                <div class="theme-toggle">
+                    <input type="checkbox" id="themeSwitch" aria-label="Toggle Dark Mode">
+                    <label for="themeSwitch"><i class="fas fa-moon"></i></label>
+                </div>
+                <!-- Navigation to Admin Page -->
+                <div class="admin-toggle">
+                    <a href="admin.html" class="btn admin-btn"><i class="fas fa-user-shield"></i> Admin Panel</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Quiz Selection Dropdown -->
+        <section class="quiz-selection card">
+            <h2>Select a Quiz</h2>
+            <div class="selection-container">
+                <label for="quizDropdown">Choose Date:</label>
+                <select id="quizDropdown" aria-label="Select Quiz Date">
+                    <option value="">-- Select Date --</option>
+                    <!-- Quiz dates will be populated here -->
+                </select>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="quiz-section card" id="quizSection" style="display:none;">
+            <h2>Quiz for <span id="selectedDate"></span></h2>
+            <form id="quizForm">
+                <div id="questionContainer">
+                    <!-- Questions will be injected here -->
+                </div>
+                <button type="button" class="btn submit-btn" id="submitQuiz"><i class="fas fa-paper-plane"></i> Submit Quiz</button>
+            </form>
+        </section>
+
+        <!-- Result Section -->
+        <section class="result-section card" id="resultSection" style="display:none;">
+            <h2>Your Results</h2>
+            <canvas id="resultChart" width="400" height="200"></canvas>
+            <div class="feedback" id="feedback"></div>
+            <div id="promoCode" class="promo" style="display:none;">
+                <strong>Congratulations!</strong> You've earned a promo code: <span id="code"></span>
+            </div>
+            <div class="result-actions">
+                <button class="btn view-leaderboard-btn" id="viewLeaderboard"><i class="fas fa-trophy"></i> View Leaderboard</button>
+                <button class="btn close-btn" id="closeResult"><i class="fas fa-times"></i> Close</button>
+            </div>
+        </section>
+
+        <!-- Completed Quiz Section -->
+        <section class="completed-section card" id="completedSection" style="display:none;">
+            <h2>Quiz Completed</h2>
+            <p>Your Score: <span id="completedScore"></span>%</p>
+            <div id="completedPromoCode" class="promo" style="display:none;">
+                <strong>Congratulations!</strong> You've earned a promo code: <span id="completedCode"></span>
+            </div>
+            <div class="result-actions">
+                <button class="btn view-leaderboard-btn" id="viewLeaderboardCompleted"><i class="fas fa-trophy"></i> View Leaderboard</button>
+                <button class="btn close-btn" id="closeCompleted"><i class="fas fa-times"></i> Close</button>
+            </div>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section class="leaderboard-section card" id="leaderboardSection" style="display:none;">
+            <h2>Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Quiz Date</th>
+                        <th>Score (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- Leaderboard entries will be injected here -->
+                </tbody>
+            </table>
+            <button class="btn close-btn" id="closeLeaderboard"><i class="fas fa-times"></i> Close Leaderboard</button>
+        </section>
+
+        <!-- Reset Button -->
+        <section class="reset-section">
+            <button class="btn reset-btn" id="resetQuizzes"><i class="fas fa-redo-alt"></i> Reset All Quiz Attempts</button>
+        </section>
+    </div>
+
+    <script type="module" src="user.js"></script>
+</body>
+</html>
