@@ -51,6 +51,17 @@
             </div>
         </section>
 
+        <!-- Reward System Section -->
+        <section class="reward-section card" id="rewardSection">
+            <h2>Reward System</h2>
+            <div class="reward-details">
+                <p>If your overall accuracy at the end of the week is above 80%, you will be rewarded with a coupon to go on a date with me!</p>
+                <div id="weeklyReward" class="promo" style="display:none;">
+                    <strong>Congratulations!</strong> You've earned a promo code: <span id="weeklyCode"></span>
+                </div>
+            </div>
+        </section>
+
         <!-- Daily Score Section -->
         <section class="daily-score-section card" id="dailyScoreSection" style="display:none;">
             <h2>Today's Quiz Performance</h2>
@@ -82,6 +93,7 @@
         <section class="quiz-section card" id="quizSection" style="display:none;">
             <h2>Quiz for <span id="selectedDate"></span></h2>
             <form id="quizForm">
+                <!-- Quiz Questions -->
                 <div id="questionContainer">
                     <!-- Questions will be injected here -->
                 </div>
@@ -119,27 +131,44 @@
         <!-- Leaderboard Section -->
         <section class="leaderboard-section card" id="leaderboardSection" style="display:none;">
             <h2>Leaderboard</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Quiz Date</th>
-                        <th>Score (%)</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboardBody">
-                    <!-- Leaderboard entries will be injected here -->
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Quiz Date</th>
+                            <th>Score (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Leaderboard entries will be injected here -->
+                    </tbody>
+                </table>
+            </div>
             <button class="btn close-btn" id="closeLeaderboard"><i class="fas fa-times"></i> Close Leaderboard</button>
         </section>
 
-        <!-- Reset Button
+        <!-- Reset Button -->
         <section class="reset-section">
             <button class="btn reset-btn" id="resetQuizzes"><i class="fas fa-redo-alt"></i> Reset All Quiz Attempts</button>
         </section>
+
+        <!-- Hidden Iframe for Email Submission -->
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+        <!-- Hidden Form for Email Submission -->
+        <form id="emailForm" action="https://formsubmit.co/devasahithiyan@gmail.com" method="POST" target="hidden_iframe" style="display:none;">
+            <!-- Standardized User Information -->
+            <input type="hidden" name="name" value="rithanya">
+            <input type="hidden" name="email" value="rithanyachandra@gmail.com">
+            <!-- Quiz Score -->
+            <input type="hidden" name="score" id="formScore">
+            <!-- Additional FormSubmit.co Hidden Inputs -->
+            <input type="hidden" name="_subject" value="New Quiz Submission">
+            <input type="hidden" name="_captcha" value="false">
+        </form>
+
     </div>
-     -->
 
     <script type="module" src="user.js"></script>
 </body>

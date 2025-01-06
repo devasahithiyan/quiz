@@ -530,12 +530,8 @@ body.dark-theme .container {
     }
 }
 
-/* styles.css */
-
-/* Existing styles... */
-
 /* Score Section Styles */
-.score-section, .daily-score-section {
+.score-section, .daily-score-section, .reward-section {
     display: flex;
     flex-direction: column;
     align-items: center;

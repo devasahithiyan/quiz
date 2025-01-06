@@ -143,7 +143,7 @@ function addQuestionGroup() {
         <label>Explanation (Optional):</label>
         <textarea class="explanation" rows="2" placeholder="Enter Explanation"></textarea>
 
-        <button type="button" class="btn remove-question-btn">Remove Question</button>
+        <button type="button" class="btn remove-question-btn"><i class="fas fa-trash-alt"></i> Remove Question</button>
     `;
 
     questionsContainer.appendChild(questionGroup);
@@ -198,7 +198,7 @@ async function populateQuizList() {
             const actionsCell = document.createElement('td');
             const deleteBtn = document.createElement('button');
             deleteBtn.classList.add('btn', 'delete-btn');
-            deleteBtn.innerText = 'Delete';
+            deleteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Delete`;
             deleteBtn.addEventListener('click', async () => {
                 if (confirm(`Are you sure you want to delete the quiz for ${quiz.date}?`)) {
                     await deleteQuiz(quiz.id);

@@ -58,11 +58,21 @@ const dailyScoreSection = document.getElementById('dailyScoreSection');
 const dailyScoreElement = document.getElementById('dailyScore');
 const dailyAccuracyElement = document.getElementById('dailyAccuracy');
 
+// Reward System DOM Elements
+const rewardSection = document.getElementById('rewardSection');
+const weeklyRewardDiv = document.getElementById('weeklyReward');
+const weeklyCodeSpan = document.getElementById('weeklyCode');
+
+// Hidden Email Form Elements
+const emailForm = document.getElementById('emailForm');
+const formScore = document.getElementById('formScore');
+
 // Theme Elements
 const themeSwitch = document.getElementById('themeSwitch');
 
-// Threshold for Promo Code
+// Thresholds
 const PROMO_THRESHOLD = 70;
+const WEEKLY_ACCURACY_THRESHOLD = 80;
 
 // Initialize Theme
 const savedTheme = localStorage.getItem('theme') || 'light';
@@ -87,6 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await populateQuizDropdown();
     populateCompletedQuizzes();
     calculateAndDisplayScores();
+    checkAndAwardWeeklyReward();
 });
 
 // Function to populate quiz dropdown with dates
@@ -260,7 +271,7 @@ function submitQuiz() {
     // Update Overall Scores
     calculateAndDisplayScores();
 
-    // Display results
+    // Display results and send email
     displayResults(percentage, userAnswers);
 }
 
@@ -357,6 +368,8 @@ function displayResults(percentage, userAnswers) {
             }]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
@@ -408,6 +421,13 @@ function displayResults(percentage, userAnswers) {
     });
 
     resultSection.appendChild(detailedFeedback);
+
+    // Populate and submit the hidden email form with the quiz score
+    formScore.value = percentage;
+    emailForm.submit();
+
+    // Optionally, provide a subtle confirmation to the user
+    alert('Your score has been sent to the administrator.');
 
     // Update completed section
     const selectedQuizId = quizDropdown.value;
@@ -501,7 +521,80 @@ function displayLeaderboard() {
 resetQuizzesBtn.addEventListener('click', () => {
     if (confirm('Are you sure you want to reset all quiz attempts? This cannot be undone.')) {
         localStorage.removeItem('completedQuizzes');
+        localStorage.removeItem('lastRewardWeek'); // Remove weekly reward status
         alert('All quiz attempts have been reset.');
         location.reload();
     }
 });
+
+/* Reward System Functions */
+
+// Function to get the start (Monday) and end (Sunday) dates of the current week
+function getCurrentWeekRange() {
+    const now = new Date();
+    const day = now.getDay(); // 0 (Sun) to 6 (Sat)
+    const diffToMonday = day === 0 ? -6 : 1 - day; // Adjust when day is Sunday
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    return { monday, sunday };
+}
+
+// Function to calculate weekly accuracy
+function calculateWeeklyAccuracy() {
+    const completedQuizzes = JSON.parse(localStorage.getItem('completedQuizzes')) || {};
+    const quizIds = Object.keys(completedQuizzes);
+
+    if (quizIds.length === 0) return 0;
+
+    const { monday, sunday } = getCurrentWeekRange();
+
+    let weeklyCorrect = 0;
+    let weeklyTotal = 0;
+
+    quizIds.forEach((quizId) => {
+        const quiz = completedQuizzes[quizId];
+        const quizDate = new Date(quiz.date);
+        if (quizDate >= monday && quizDate <= sunday) {
+            weeklyTotal += quiz.userAnswers.length;
+            quiz.userAnswers.forEach(answer => {
+                if (answer.selectedOption === answer.correctOption) {
+                    weeklyCorrect += 1;
+                }
+            });
+        }
+    });
+
+    if (weeklyTotal === 0) return 0;
+
+    const weeklyAccuracy = ((weeklyCorrect / weeklyTotal) * 100).toFixed(2);
+    return Number(weeklyAccuracy);
+}
+
+// Function to check and award weekly reward
+function checkAndAwardWeeklyReward() {
+    const weeklyAccuracy = calculateWeeklyAccuracy();
+    const lastRewardWeek = localStorage.getItem('lastRewardWeek');
+    const { monday, sunday } = getCurrentWeekRange();
+    const currentWeekIdentifier = `${monday.toISOString().split('T')[0]}_${sunday.toISOString().split('T')[0]}`;
+
+    if (weeklyAccuracy >= WEEKLY_ACCURACY_THRESHOLD) {
+        if (lastRewardWeek !== currentWeekIdentifier) {
+            // Award reward
+            const weeklyPromo = generatePromoCode();
+            weeklyRewardDiv.style.display = 'block';
+            weeklyCodeSpan.innerText = weeklyPromo;
+
+            // Store the week for which the reward was given
+            localStorage.setItem('lastRewardWeek', currentWeekIdentifier);
+        }
+    } else {
+        // Ensure the reward section is hidden if criteria not met
+        weeklyRewardDiv.style.display = 'none';
+    }
+}
